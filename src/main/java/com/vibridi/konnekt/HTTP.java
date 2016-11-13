@@ -32,6 +32,10 @@ public class HTTP {
 	}	
 	
 	// ******* PUBLIC METHODS ********
+	public String getFullUrl() {
+		return resolveParams();
+	}
+	
 	public HTTP appendPath(String path) {
 		sb.append(path);
 		return this;
@@ -104,9 +108,8 @@ public class HTTP {
 	// ******* HTTP METHODS ********
 	public String get() throws IOException {
 		HttpURLConnection conn = getConnection();
-		
-		
-		return null;
+		conn.setRequestMethod(Method.GET.name());
+		return execute(conn);
 	}
 	
 	public String post(String payload) throws IOException {
@@ -118,32 +121,42 @@ public class HTTP {
 		out.writeBytes(payload);
 		out.flush();
 		out.close();
-				
-		try {
-			return readStream(conn.getInputStream());
-		} catch(Exception e) {
-			return readStream(conn.getErrorStream());
-		}		
+		return execute(conn);		
 	}
 	
-	public String put(String payload) {
-		
-		return null;
+	public String put(String payload) throws IOException {
+		HttpURLConnection conn = getConnection();
+		conn.setRequestMethod(Method.PUT.name());
+		conn.setDoInput(true);
+		conn.setDoOutput(true);
+		DataOutputStream out = new DataOutputStream(conn.getOutputStream());
+		out.writeBytes(payload);
+		out.flush();
+		out.close();
+		return execute(conn);
 	}
 	
-	public String delete() {
-		
-		return null;
+	public String delete() throws IOException {
+		HttpURLConnection conn = getConnection();
+		conn.setRequestMethod(Method.DELETE.name());
+		return execute(conn);
 	}
 	
 	
 	// ******* PRIVATE METHODS ********
 	private HttpURLConnection getConnection() throws MalformedURLException, IOException {
-		resolveParams();
-		URL url = new URL(sb.toString());
+		URL url = new URL(resolveParams());
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		resolveHeaders(conn);
 		return conn;
+	}
+	
+	private String execute(HttpURLConnection conn) throws IOException {
+		try {
+			return readStream(conn.getInputStream());
+		} catch(Exception e) {
+			return readStream(conn.getErrorStream());
+		}
 	}
 	
 	private String readStream(InputStream is) throws IOException {
@@ -158,19 +171,22 @@ public class HTTP {
 		return response.toString();
 	}
 	
-	protected void resolveParams() {
+	private String resolveParams() {
 		if(params.size() < 1)
-			return;
+			return sb.toString();
 		
-		sb.append("?");
+		StringBuffer tmp = new StringBuffer(sb.toString());
+		tmp.append("?");
 		Iterator<String> itr = params.keySet().iterator();
 		do {
 			String k = itr.next();
-			sb.append(k).append("=").append(params.get(k));	
-		} while(itr.hasNext() && sb.append("&").length() > 0);
+			tmp.append(k).append("=").append(params.get(k));	
+		} while(itr.hasNext() && tmp.append("&").length() > 0);
+		
+		return tmp.toString();
 	}
 	
-	protected void resolveHeaders(HttpURLConnection conn) {
+	private void resolveHeaders(HttpURLConnection conn) {
 		for(Map.Entry<String, String> entry : headers.entrySet())
 			conn.setRequestProperty(entry.getKey(), entry.getValue());
 	}
