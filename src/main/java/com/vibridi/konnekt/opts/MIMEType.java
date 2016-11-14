@@ -9,6 +9,7 @@ public enum MIMEType {
 	APPLICATION_VND("application/vnd"),
 	APPLICATION_X_JAVASCRIPT("application/x-javascript"),
 	APPLICATION_X_PERL("application/x-perl"),
+	APPLICATION_X_WWW_URL_ENCODED("application/x-www-form-urlencoded"),
 	APPLICATION_XML("application/xml"),
 	APPLICATION_XML_SOAP("application/xml+soap"),
 	APPLICATION_ZIP("application/zip"),
