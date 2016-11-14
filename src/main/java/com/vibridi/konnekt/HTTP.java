@@ -37,7 +37,7 @@ public class HTTP {
 	}
 	
 	public HTTP appendPath(String path) {
-		sb.append("/").append(path);
+		sb.append(path);
 		return this;
 	}
 	
