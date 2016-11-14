@@ -18,7 +18,7 @@ public class HTTPTest {
 	public void testString() {
 		HTTP http = HTTP.create("http://www.httpbin.org");
 		assertTrue(http.getFullUrl().equals("http://www.httpbin.org"));
-		http.appendPath("/path");
+		http.appendPath("path");
 		assertTrue(http.getFullUrl().equals("http://www.httpbin.org/path"));
 		http.setParam("param1", "abc");
 		http.setParam("param2", "123");
@@ -29,7 +29,7 @@ public class HTTPTest {
 	public void testChain() {
 		assertTrue(
 			HTTP.create("http://www.httpbin.org")
-				.appendPath("/path")
+				.appendPath("path")
 				.setParam("param1", "abc")
 				.setParam("param2", "123")
 				.getFullUrl()
@@ -44,7 +44,7 @@ public class HTTPTest {
 		obj.put("test-field", "konnekt-test");
 		
 		String res = HTTP.create("http://www.httpbin.org")
-				.appendPath("/post")
+				.appendPath("post")
 				.setContentType(MIMEType.APPLICATION_JSON)
 				.post(obj.toString());	
 		
@@ -56,7 +56,7 @@ public class HTTPTest {
 	@Test
 	public void testHeaders() throws IOException {
 		String res = HTTP.create("http://www.httpbin.org")
-				.appendPath("/headers")
+				.appendPath("headers")
 				.setAccept(MIMEType.APPLICATION_JSON)
 				.setContentType(MIMEType.TEXT_PLAIN)
 				.setHost("www.httpbin.org")
@@ -74,7 +74,7 @@ public class HTTPTest {
 	@Test
 	public void testGet() throws IOException {
 		String res = HTTP.create("http://www.httpbin.org")
-				.appendPath("/user-agent")
+				.appendPath("user-agent")
 				.setUserAgent("konnekt-test")
 				.get();	
 		
@@ -90,7 +90,7 @@ public class HTTPTest {
 		obj.put("test-field", "konnekt-test");
 		
 		String res = HTTP.create("http://www.httpbin.org")
-				.appendPath("/put")
+				.appendPath("put")
 				.setContentType(MIMEType.APPLICATION_JSON)
 				.put(obj.toString());	
 		
@@ -102,7 +102,7 @@ public class HTTPTest {
 	@Test
 	public void testDelete() throws IOException {
 		String res = HTTP.create("http://www.httpbin.org")
-				.appendPath("/delete")
+				.appendPath("delete")
 				.setParam("param1", "abc")
 				.setParam("param2", "def")
 				.delete();
