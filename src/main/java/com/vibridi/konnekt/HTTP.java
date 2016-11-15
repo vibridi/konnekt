@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.vibridi.konnekt.exception.HttpException;
 import com.vibridi.konnekt.opts.MIMEType;
 import com.vibridi.konnekt.opts.Method;
 
@@ -151,15 +152,30 @@ public class HTTP {
 		return conn;
 	}
 	
-	private String execute(HttpURLConnection conn) throws IOException {
+	/**
+	 * 
+	 * @param conn
+	 * @return
+	 * @throws IOException in case of connection errors (timeouts, connection refused, etc...)
+	 * @throws HttpException in case of HTTP errors. The exception object contains the response code and 
+	 * the content of the error stream
+	 */
+	private String execute(HttpURLConnection conn) throws IOException, HttpException {
+		int responseCode = conn.getResponseCode();
 		try {
 			return readStream(conn.getInputStream());
 		} catch(Exception e) {
-			return readStream(conn.getErrorStream());
+			String error = "";
+			try {
+				error = readStream(conn.getErrorStream());
+			} catch(IOException f) {
+				throw new HttpException(e.getMessage(), f, responseCode);
+			}
+			throw new HttpException(error, e, responseCode);
 		}
 	}
 	
-	private String readStream(InputStream is) throws IOException {
+	private String readStream(InputStream is) throws IOException {		
 		BufferedReader in = new BufferedReader(new InputStreamReader(is));
 		String inputLine;
 		StringBuffer response = new StringBuffer();

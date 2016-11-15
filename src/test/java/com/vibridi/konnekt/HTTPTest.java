@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.vibridi.konnekt.exception.HttpException;
 import com.vibridi.konnekt.opts.MIMEType;
 
 public class HTTPTest {
@@ -111,6 +112,23 @@ public class HTTPTest {
 		JsonNode jn = om.readTree(res);
 		assertTrue(jn.get("args").get("param1").asText().equals("abc"));
 		assertTrue(jn.get("args").get("param2").asText().equals("def"));
+	}
+	
+	@Test(expected = IOException.class)
+	public void testError() throws IOException {
+		HTTP.create("http://localhost:8080").get();
+	}
+	
+	@Test(expected = HttpException.class)
+	public void test404() throws IOException, HttpException {
+		try {
+			HTTP.create("http://www.httpbin.org")
+			.appendPath("/nosuchpath")
+			.get();
+		} catch(HttpException e) {
+			assertTrue(e.getResponseCode() == 404);
+			throw e;
+		}
 	}
 	
 }
