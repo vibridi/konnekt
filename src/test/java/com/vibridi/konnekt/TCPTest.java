@@ -12,7 +12,7 @@ import java.nio.charset.Charset;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
-public class TCPTest {
+public class TCPTest extends BaseTest {
 
 	private static final int testPort = 60800;
 
@@ -75,11 +75,6 @@ public class TCPTest {
 		String echo = TCPIP.create("localhost", server.getPort()).send(test);
 		assertTrue(echo.equals(test));
 		t.join();
-	}
-
-	
-	public String getTestResource(String name) throws IOException {
-		return IOUtils.toString(this.getClass().getResourceAsStream("/"+name), Charset.forName("UTF-8"));
 	}
 
 }

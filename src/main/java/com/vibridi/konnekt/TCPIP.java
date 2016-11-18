@@ -7,14 +7,14 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 
-import com.vibridi.konnekt.misc.DefaultInputReadStrategy;
-import com.vibridi.konnekt.misc.InputReadStrategy;
+import com.vibridi.konnekt.read.DefaultInReader;
+import com.vibridi.konnekt.read.InReader;
 
 public class TCPIP {
 
 	private String server;
 	private int port;
-	private InputReadStrategy irs;
+	private InReader irs;
 	
 	public static TCPIP create(String server, int port) {
 		return new TCPIP(server, port);
@@ -25,7 +25,7 @@ public class TCPIP {
 		this.port = port;
 	}
 	
-	public TCPIP setInputReadStrategy(InputReadStrategy strategy) {
+	public TCPIP setInputReadStrategy(InReader strategy) {
 		this.irs = strategy;
 		return this;
 	}
@@ -42,7 +42,7 @@ public class TCPIP {
 		out.write(data);
 		
 		if(irs == null) {
-			irs = new DefaultInputReadStrategy();
+			irs = new DefaultInReader();
 		}
 		
 		byte[] content = irs.readInput(in);

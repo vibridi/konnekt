@@ -2,13 +2,13 @@ package com.vibridi.konnekt;
 
 import java.io.IOException;
 
-import com.vibridi.konnekt.misc.MllpInputReadStrategy;
+import com.vibridi.konnekt.read.MllpInReader;
 
 public class MLLP {
 
-	public static final char START_BLOCK = 0x0B;
-	public static final char END_BLOCK = 0x1C;
-	public static final char CARRIAGE_RETURN = 0x0D; // '\r'
+	public static final byte START_BLOCK = 0x0B;		// <VT>
+	public static final byte END_BLOCK = 0x1C;			// <FS>
+	public static final byte CARRIAGE_RETURN = 0x0D; 	// \r
 	
 	private String server;
 	private int port;
@@ -33,10 +33,7 @@ public class MLLP {
 	 * @throws IOException
 	 */
 	public String send(String data) throws IOException {
-		return send(data
-				.replace("\r\n","\r")	// windows 
-				.replace("\n","\r")		// unix and unix-like
-				.getBytes());
+		return send(data.replace("\r\n", "\r").replace("\n", "\r").getBytes());
 	}
 	
 	/**
@@ -53,12 +50,12 @@ public class MLLP {
 		
 		mllp[0] = START_BLOCK;
 		System.arraycopy(data, 0, mllp, 1, data.length);
-		mllp[data.length] = END_BLOCK;
-		mllp[data.length + 1] = CARRIAGE_RETURN;
+		mllp[data.length + 1] = END_BLOCK;
+		mllp[data.length + 2] = CARRIAGE_RETURN;
 		
 		return TCPIP.create(server, port)
-				.setInputReadStrategy(new MllpInputReadStrategy())
-				.send(data);
+				.setInputReadStrategy(new MllpInReader())
+				.send(mllp);
 	}
 	
 }
