@@ -17,7 +17,7 @@ public class HTTPTest {
 	
 	@Test
 	public void testString() {
-		HTTP http = HTTP.create("http://www.httpbin.org");
+		HTTP http = HTTP.build("http://www.httpbin.org");
 		assertTrue(http.getFullUrl().equals("http://www.httpbin.org"));
 		http.appendPath("/path");
 		assertTrue(http.getFullUrl().equals("http://www.httpbin.org/path"));
@@ -29,7 +29,7 @@ public class HTTPTest {
 	@Test
 	public void testChain() {
 		assertTrue(
-			HTTP.create("http://www.httpbin.org")
+			HTTP.build("http://www.httpbin.org")
 				.appendPath("/path")
 				.setParam("param1", "abc")
 				.setParam("param2", "123")
@@ -44,9 +44,9 @@ public class HTTPTest {
 		ObjectNode obj = fac.objectNode();
 		obj.put("test-field", "konnekt-test");
 		
-		String res = HTTP.create("http://www.httpbin.org")
+		String res = HTTP.build("http://www.httpbin.org")
 				.appendPath("/post")
-				.setContentType(MIMEType.APPLICATION_JSON)
+				.setContentType(MIMEType.APPLICATION_JSON.stringValue())
 				.post(obj.toString());	
 		
 		ObjectMapper om = new ObjectMapper();
@@ -56,10 +56,10 @@ public class HTTPTest {
 	
 	@Test
 	public void testHeaders() throws IOException {
-		String res = HTTP.create("http://www.httpbin.org")
+		String res = HTTP.build("http://www.httpbin.org")
 				.appendPath("/headers")
 				.setAccept(MIMEType.APPLICATION_JSON)
-				.setContentType(MIMEType.TEXT_PLAIN)
+				.setContentType(MIMEType.TEXT_PLAIN.stringValue())
 				.setHost("www.httpbin.org")
 				.setUserAgent("konnekt-test")
 				.get();
@@ -74,7 +74,7 @@ public class HTTPTest {
 	
 	@Test
 	public void testGet() throws IOException {
-		String res = HTTP.create("http://www.httpbin.org")
+		String res = HTTP.build("http://www.httpbin.org")
 				.appendPath("/user-agent")
 				.setUserAgent("konnekt-test")
 				.get();	
@@ -90,9 +90,9 @@ public class HTTPTest {
 		ObjectNode obj = fac.objectNode();
 		obj.put("test-field", "konnekt-test");
 		
-		String res = HTTP.create("http://www.httpbin.org")
+		String res = HTTP.build("http://www.httpbin.org")
 				.appendPath("/put")
-				.setContentType(MIMEType.APPLICATION_JSON)
+				.setContentType(MIMEType.APPLICATION_JSON.stringValue())
 				.put(obj.toString());	
 		
 		ObjectMapper om = new ObjectMapper();
@@ -102,7 +102,7 @@ public class HTTPTest {
 	
 	@Test
 	public void testDelete() throws IOException {
-		String res = HTTP.create("http://www.httpbin.org")
+		String res = HTTP.build("http://www.httpbin.org")
 				.appendPath("/delete")
 				.setParam("param1", "abc")
 				.setParam("param2", "def")
@@ -116,13 +116,13 @@ public class HTTPTest {
 	
 	@Test(expected = IOException.class)
 	public void testError() throws IOException {
-		HTTP.create("http://localhost:8080").get();
+		HTTP.build("http://localhost:8080").get();
 	}
 	
 	@Test(expected = HttpException.class)
 	public void test404() throws IOException, HttpException {
 		try {
-			HTTP.create("http://www.httpbin.org")
+			HTTP.build("http://www.httpbin.org")
 			.appendPath("/nosuchpath")
 			.get();
 		} catch(HttpException e) {

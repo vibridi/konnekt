@@ -3,7 +3,6 @@ package com.vibridi.konnekt.read;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.SocketException;
 
 import com.vibridi.konnekt.MLLP;
 import com.vibridi.konnekt.exception.MllpException;

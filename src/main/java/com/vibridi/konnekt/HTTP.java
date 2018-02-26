@@ -1,28 +1,39 @@
 package com.vibridi.konnekt;
 
-import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSocketFactory;
+
 import com.vibridi.konnekt.exception.HttpException;
 import com.vibridi.konnekt.opts.MIMEType;
-import com.vibridi.konnekt.opts.Method;
+import com.vibridi.konnekt.util.IOUtils;
 
 public class HTTP {
+	
+	public enum Method {
+		GET,
+		POST,
+		PUT,
+		DELETE,
+		HEAD,
+		OPTIONS,
+		CONNECT
+	}
 
 	private StringBuffer sb;
 	private Map<String,String> params;
 	private Map<String,String> headers;
 	
-	public static HTTP create(String url) {
+	public static HTTP build(String url) {
 		return new HTTP(url);
 	}
 	
@@ -69,8 +80,8 @@ public class HTTP {
 		return this;
 	}
 	
-	public HTTP setContentType(MIMEType mimeType) {
-		headers.put("Content-Type", mimeType.stringValue());
+	public HTTP setContentType(String mimeType) {
+		headers.put("Content-Type", mimeType);
 		return this;
 	}
 	
@@ -119,7 +130,7 @@ public class HTTP {
 		conn.setDoInput(true);
 		conn.setDoOutput(true);
 		DataOutputStream out = new DataOutputStream(conn.getOutputStream());
-		out.writeBytes(payload);
+		out.write(payload.getBytes());
 		out.flush();
 		out.close();
 		return execute(conn);		
@@ -147,7 +158,15 @@ public class HTTP {
 	// ******* PRIVATE METHODS ********
 	private HttpURLConnection getConnection() throws MalformedURLException, IOException {
 		URL url = new URL(resolveParams());
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+		HttpURLConnection conn = null;
+		
+		if (url.toString().toLowerCase().startsWith("https")){
+			conn = (HttpsURLConnection) url.openConnection();
+			((HttpsURLConnection) conn).setSSLSocketFactory((SSLSocketFactory) SSLSocketFactory.getDefault());
+		} else {
+			conn = (HttpURLConnection) url.openConnection();
+		}
+		
 		resolveHeaders(conn);
 		return conn;
 	}
@@ -161,30 +180,23 @@ public class HTTP {
 	 * the content of the error stream
 	 */
 	private String execute(HttpURLConnection conn) throws IOException, HttpException {
-		int responseCode = conn.getResponseCode();
+		int responseCode = conn.getResponseCode(); // throws if it can't get the resp code
+		System.out.println("HTTP response code: " + responseCode);
+			
 		try {
-			return readStream(conn.getInputStream());
-		} catch(Exception e) {
+			String response = IOUtils.toString(conn.getInputStream(), StandardCharsets.UTF_8);
+			System.out.println(response);
+			return response; // all good, here usually resp code is 200
+			
+		} catch(Exception e) { // couldn't read the input stream, try reading error stream
 			String error = "";
 			try {
-				error = readStream(conn.getErrorStream());
-			} catch(IOException f) {
+				error = IOUtils.toString(conn.getErrorStream(), StandardCharsets.UTF_8);
+			} catch(IOException f) { // couldn't read the error stream, though resp code is known
 				throw new HttpException(e.getMessage(), f, responseCode);
 			}
-			throw new HttpException(error, e, responseCode);
+			throw new HttpException(error, e, responseCode); // could read the error stream and resp code is known
 		}
-	}
-	
-	private String readStream(InputStream is) throws IOException {		
-		BufferedReader in = new BufferedReader(new InputStreamReader(is));
-		String inputLine;
-		StringBuffer response = new StringBuffer();
-
-		while ((inputLine = in.readLine()) != null) {
-			response.append(inputLine);
-		}
-		in.close();
-		return response.toString();
 	}
 	
 	private String resolveParams() {

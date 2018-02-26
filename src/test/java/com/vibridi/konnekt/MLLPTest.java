@@ -66,7 +66,7 @@ public class MLLPTest extends BaseTest {
 		t.start();
 	
 		String test = this.getTestResource("hl7.txt");
-		String echo = MLLP.create("localhost", server.getPort()).send(test);
+		String echo = MLLP.build("localhost", server.getPort()).send(test);
 		assertTrue(echo.equals(test.replace("\r\n", "\r")));
 		t.join();
 	}

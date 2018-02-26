@@ -13,7 +13,7 @@ public class MLLP {
 	private String server;
 	private int port;
 	
-	public static MLLP create(String server, int port) {
+	public static MLLP build(String server, int port) {
 		return new MLLP(server,port);
 	}	
 	
