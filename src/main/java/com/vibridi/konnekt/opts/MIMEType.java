@@ -1,5 +1,9 @@
 package com.vibridi.konnekt.opts;
 
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
+
 public enum MIMEType {
 
 	APPLICATION_JSON("application/json"),
@@ -32,6 +36,20 @@ public enum MIMEType {
 	
 	VIDEO_AVI("video/avi"),
 	VIDEO_MPEG("video/mpeg");
+	
+	
+	
+	private static final Map<String, MIMEType> map = new HashMap<>();
+	
+	static {
+		for(MIMEType value : EnumSet.allOf(MIMEType.class)) {
+            map.put(value.stringValue(), value);
+        }
+	}
+	
+	public static MIMEType forName(String mimeType) {
+		return map.get(mimeType);
+	}
 	
 	private String value;
 	
