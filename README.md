@@ -18,7 +18,7 @@ MLLP is a protocol built on top of TCP/IP that uses two lower-ASCII control char
 <VT>payload<FS><CR>
 ```
 
-Whereas <VT> is ASCII 0x0B, <FS> is ASCII 0x1C and <CR> is the carriage return, or '\r'.
+Whereas `<VT>` is ASCII 0x0B, `<FS>` is ASCII 0x1C and `<CR>` is the carriage return, or '\r'.
 
 ## More about usage
 
